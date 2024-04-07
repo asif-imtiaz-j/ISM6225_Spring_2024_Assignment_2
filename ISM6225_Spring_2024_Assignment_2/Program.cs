@@ -100,7 +100,25 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return 0;
+
+                if (nums == null || nums.Length == 0)
+                {
+                    return 0;
+                }
+
+                int uniqueCount = 1; // Since the array is non-empty, there's at least one unique element
+
+                for (int i = 1; i < nums.Length; i++)
+                {
+                    if (nums[i] != nums[i - 1]) // If the current element is not a duplicate
+                    {
+                        nums[uniqueCount] = nums[i]; // Move the unique element to the front
+                        uniqueCount++; // Increment the count of unique elements
+                    }
+                }
+
+                return uniqueCount; // Return the count of unique elements
+
             }
             catch (Exception)
             {
@@ -135,7 +153,23 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return new List<int>();
+                int lastNonZeroFoundAt = 0;
+                // Move all the non-zero elements to the beginning of the array
+                for (int i = 0; i < nums.Length; i++)
+                {
+                    if (nums[i] != 0)
+                    {
+                        nums[lastNonZeroFoundAt++] = nums[i];
+                    }
+                }
+                // Fill the remaining array with 0's
+                for (int i = lastNonZeroFoundAt; i < nums.Length; i++)
+                {
+                    nums[i] = 0;
+                }
+
+
+                return nums.ToList();
             }
             catch (Exception)
             {
@@ -186,7 +220,37 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return new List<IList<int>>();
+
+                Array.Sort(nums);
+                var result = new List<IList<int>>();
+
+                for (int i = 0; i < nums.Length - 2; i++)
+                {
+                    if (i > 0 && nums[i] == nums[i - 1]) continue; // skip same result
+                    int left = i + 1, right = nums.Length - 1;
+                    while (left < right)
+                    {
+                        int sum = nums[i] + nums[left] + nums[right];
+                        if (sum == 0)
+                        {
+                            result.Add(new List<int> { nums[i], nums[left], nums[right] });// Add the elements to the list
+                            while (left < right && nums[left] == nums[left + 1]) left++; //skip the duplicate elements from left
+                            while (left < right && nums[right] == nums[right - 1]) right--; // skip the duplicate elements from right 
+                            left++;
+                            right--;
+                        }
+                        else if (sum < 0)
+                        {
+                            left++;
+                        }
+                        else
+                        {
+                            right--;
+                        }
+                    }
+                }
+                return result; //return list of triplets
+
             }
             catch (Exception)
             {
@@ -221,7 +285,22 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return 0;
+                int max = 0, current = 0;
+
+                foreach (int num in nums)  // Iterate through the array
+                {
+                    if (num == 1)
+                    {
+                        current++;  //Increment the current value by 1
+                        max = Math.Max(max, current); //update the maximum consecutive ones if needed
+                    }
+                    else
+                    {
+                        current = 0;
+                    }
+                }
+                return max;
+
             }
             catch (Exception)
             {
@@ -257,7 +336,16 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return 0;
+                int decimalValue = 0, baseValue = 1;
+                while (binary > 0) //iterate over each bit
+                {
+                    int lastDigit = binary % 10; //extracting the rightmost bit
+                    binary = binary / 10; // Remove the rightmost bit
+                    decimalValue += lastDigit * baseValue; //update the decimal number by adding the contribution of the current bit
+                    baseValue = baseValue * 2; //move to the next bit position by increasing the base value
+                }
+                return decimalValue;
+
             }
             catch (Exception)
             {
@@ -294,8 +382,29 @@ namespace ISM6225_Spring_2024_Assignment_2
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return 0;
+                if (nums.Length < 2) return 0;
+                int min = nums.Min(), max = nums.Max(), gap = Math.Max(1, (max - min) / (nums.Length - 1));
+                int bucketSize = (max - min) / gap + 1;
+                int?[] minVals = new int?[bucketSize], maxVals = new int?[bucketSize];
+
+                foreach (var num in nums)
+                {
+                    int idx = (num - min) / gap;
+                    if (!minVals[idx].HasValue || num < minVals[idx]) minVals[idx] = num;
+                    if (!maxVals[idx].HasValue || num > maxVals[idx]) maxVals[idx] = num;
+                }
+
+                int maxGap = 0, previousMax = min;
+                for (int i = 0; i < bucketSize; i++)
+                {
+                    if (!minVals[i].HasValue) continue;  // Skip empty buckets.
+                    maxGap = Math.Max(maxGap, minVals[i].Value - previousMax); // The gap is the difference between the minimum value in the current bucket and the maximum value in the previous bucket.
+                    previousMax = maxVals[i].Value;
+                }
+
+                return maxGap;
+
+
             }
             catch (Exception)
             {
@@ -335,6 +444,15 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
+
+                Array.Sort(nums); // sorting the array 
+                for (int i = nums.Length - 3; i >= 0; i--) //Iterate through array
+                {
+                    if (nums[i] + nums[i + 1] > nums[i + 2])
+                    {
+                        return nums[i] + nums[i + 1] + nums[i + 2];
+                    }
+                }
                 return 0;
             }
             catch (Exception)
@@ -389,7 +507,24 @@ namespace ISM6225_Spring_2024_Assignment_2
             try
             {
                 // Write your code here and you can modify the return value according to the requirements
-                return "";
+
+                int partLength = part.Length;
+                // Using a StringBuilder for efficient string manipulation
+                StringBuilder sb = new StringBuilder(s);
+
+                // Find the index of the part string in s
+                int index = sb.ToString().IndexOf(part);
+
+                // Loop until all occurrences of part are removed from s
+                while (index != -1)
+                {
+                    sb.Remove(index, partLength);
+                    index = sb.ToString().IndexOf(part);
+                }
+
+                // Return the final string after removing all occurrences of part
+                return sb.ToString();
+
             }
             catch (Exception)
             {
